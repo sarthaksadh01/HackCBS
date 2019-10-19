@@ -5,9 +5,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.widget.Toast;
+
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
+
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.URLEncoder;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 
 public class IncomingSms extends BroadcastReceiver {
@@ -31,6 +48,7 @@ public class IncomingSms extends BroadcastReceiver {
                     String sender = messages[i].getOriginatingAddress();
                     String message = messages[i].getMessageBody();
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                    detectSpam(message,context);
                 }
 
             }
@@ -38,5 +56,31 @@ public class IncomingSms extends BroadcastReceiver {
         }
 
     }
+
+    public void detectSpam(String text, final Context context){
+
+
+        AndroidNetworking.initialize(context);
+        AndroidNetworking.post("https://fierce-cove-29863.herokuapp.com/createAnUser")
+                .addBodyParameter("firstname", "Amit")
+                .addBodyParameter("lastname", "Shekhar")
+                .setTag("test")
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Toast.makeText(context,response.toString(),Toast.LENGTH_LONG).show();
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        // handle error
+                    }
+                });
+
+
+    }
+
+
 }
 

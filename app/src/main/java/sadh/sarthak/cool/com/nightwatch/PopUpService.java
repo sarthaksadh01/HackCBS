@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -33,6 +34,7 @@ public class PopUpService extends Service implements View.OnClickListener {
     private Point szWindow = new Point();
     private View removeFloatingWidgetView;
     TextView textView;
+    String response;
 
     private int x_init_cord, y_init_cord, x_init_margin, y_init_margin;
 
@@ -46,6 +48,9 @@ public class PopUpService extends Service implements View.OnClickListener {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+
+
+
         return null;
     }
 
@@ -65,6 +70,7 @@ public class PopUpService extends Service implements View.OnClickListener {
         addFloatingWidgetView(inflater);
         implementClickListeners();
         implementTouchListenerToFloatingWidgetView();
+
     }
 
 
@@ -496,18 +502,11 @@ public class PopUpService extends Service implements View.OnClickListener {
 
 
     public String performClipboardCheck() {
-        ClipboardManager cb = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        if (cb.hasPrimaryClip()) {
-            ClipData cd = cb.getPrimaryClip();
-            assert cd != null;
-            if (cd.getDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
 
-                return  cd.getItemAt(0).getText().toString();
+        SharedPreferences prefs = getSharedPreferences("MY_PREFS_NAME", MODE_PRIVATE);
+        String result = prefs.getString("result", "No name defined");
+        return result;
 
-            }
-            else return "";
-        }
-        else return "";
 
     }
 
